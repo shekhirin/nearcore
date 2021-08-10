@@ -937,6 +937,18 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2ae45936bbf9bddd6a0268c0ea5d3814a72403f4b69a1c318aae2ce90444ad55"
 
 [[package]]
+name = "config-dump"
+version = "0.1.0"
+dependencies = [
+ "near-chain",
+ "near-jsonrpc",
+ "near-primitives",
+ "near-store",
+ "nearcore",
+ "serde_json",
+]
+
+[[package]]
 name = "conqueue"
 version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
