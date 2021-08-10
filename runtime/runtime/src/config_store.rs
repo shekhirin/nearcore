@@ -15,6 +15,6 @@ impl RuntimeConfigStore {
     /// If `max_gas_burnt_view` is provided, the property in wasm limit
     /// configuration will be adjusted to given value.
     pub fn new(max_gas_burnt_view: Option<Gas>) -> Self {
-
+        Self {store: BTreeMap::default()}
     }
 }
