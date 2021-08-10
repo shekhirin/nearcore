@@ -1,14 +1,11 @@
-use std::collections::HashSet;
 use std::io::Result;
-use std::iter::FromIterator;
-use std::path::Path;
+use near_primitives::runtime::config::RuntimeConfig;
 
-use clap::{App, Arg};
 
 fn main() -> Result<()> {
     println!(
         "{}",
-        serde_json::to_string(RuntimeConfig::default())
+        serde_json::to_string_pretty(&RuntimeConfig::default())
             .unwrap()
     );
     Ok(())
