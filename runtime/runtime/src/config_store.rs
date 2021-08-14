@@ -1,7 +1,7 @@
 use include_dir::{include_dir, Dir};
 use std::path::Path;
 
-const PROJECT_DIR: Dir = include_dir!(".");
+const PROJECT_DIR: Dir = include_dir!("../../../nearcore/res/runtime_configs");
 use std::fs;
 
 use std::collections::BTreeMap;
@@ -21,10 +21,13 @@ impl RuntimeConfigStore {
     /// If `max_gas_burnt_view` is provided, the property in wasm limit
     /// configuration will be adjusted to given value.
     pub fn new(max_gas_burnt_view: Option<Gas>) -> Self {
-        let paths = fs::read_dir("../../../nearcore/res/runtime_configs").unwrap();
-        for path in paths {
-            println!("Name: {}", path.unwrap().path().display())
+        for file in PROJECT_DIR.files() {
+            println!("Name: {}", file.path().display());
         }
+        // let paths = fs::read_dir("../../../nearcore/res/runtime_configs").unwrap();
+        // for path in paths {
+        //     println!("Name: {}", path.unwrap().path().display())
+        // }
         Self {store: BTreeMap::default()}
     }
 }
