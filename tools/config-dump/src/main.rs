@@ -8,6 +8,6 @@ fn main() -> Result<()> {
         serde_json::to_string_pretty(&RuntimeConfig::default())
             .unwrap()
     );
-    RuntimeConfigStore::new();
+    RuntimeConfigStore::new(Some(0u64));
     Ok(())
 }
