@@ -1,6 +1,6 @@
 use std::io::Result;
 use near_primitives::runtime::config::RuntimeConfig;
-
+use node_runtime::config_store::RuntimeConfigStore;
 
 fn main() -> Result<()> {
     println!(
@@ -8,5 +8,6 @@ fn main() -> Result<()> {
         serde_json::to_string_pretty(&RuntimeConfig::default())
             .unwrap()
     );
+    RuntimeConfigStore::new();
     Ok(())
 }

@@ -945,6 +945,7 @@ dependencies = [
  "near-primitives",
  "near-store",
  "nearcore",
+ "node-runtime",
  "serde_json",
 ]
 
