@@ -1,7 +1,7 @@
 use include_dir::{include_dir, Dir};
 use std::path::Path;
 
-const PROJECT_DIR: Dir = include_dir!("../../../nearcore/res/runtime_configs");
+const PROJECT_DIR: Dir = include_dir!("../../nearcore/res/runtime_configs");
 use std::fs;
 
 use std::collections::BTreeMap;
