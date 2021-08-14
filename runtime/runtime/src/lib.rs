@@ -73,7 +73,7 @@ mod genesis;
 mod metrics;
 pub mod state_viewer;
 mod verifier;
-mod config_store;
+pub mod config_store;
 
 const EXPECT_ACCOUNT_EXISTS: &str = "account exists, checked above";
 
