@@ -9,6 +9,7 @@ use near_primitives::version::ProtocolVersion;
 use std::collections::BTreeMap;
 use std::iter::FromIterator;
 
+#[derive(Debug)]
 pub struct RuntimeConfigStore {
     /// The runtime configuration taken from the genesis file but with possibly
     /// modified `max_gas_burnt_view` limit.
