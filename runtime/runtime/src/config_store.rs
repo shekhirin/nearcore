@@ -23,7 +23,7 @@ impl RuntimeConfigStore {
         let runtime_configs_dir: Dir = include_dir!("../../nearcore/res/runtime_configs");
         for file in runtime_configs_dir.files() {
             println!("Name: {}", file.path().display());
-            let protocol_version = file.path().file_stem().parse().unwrap();
+            let protocol_version = file.path().file_stem().unwrap().parse().unwrap();
             println!("PV: {}", protocol_version);
         }
         // let paths = fs::read_dir("../../../nearcore/res/runtime_configs").unwrap();
