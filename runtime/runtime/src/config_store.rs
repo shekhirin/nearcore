@@ -1,7 +1,4 @@
 use include_dir::{include_dir, Dir};
-use std::path::Path;
-
-use std::fs;
 
 use crate::config::RuntimeConfig;
 use near_primitives::types::Gas;
@@ -9,15 +6,15 @@ use near_primitives::version::ProtocolVersion;
 use std::collections::BTreeMap;
 use std::iter::FromIterator;
 
+/// Stores runtime config for each protocol version where it was updated.
 #[derive(Debug)]
 pub struct RuntimeConfigStore {
-    /// The runtime configuration taken from the genesis file but with possibly
-    /// modified `max_gas_burnt_view` limit.
+    /// Maps protocol version to the config with possibly modified `max_gas_burnt_view` limit.
     store: BTreeMap<ProtocolVersion, RuntimeConfig>,
 }
 
 impl RuntimeConfigStore {
-    /// Constructs a new object from specified genesis runtime config.
+    /// Constructs a new store.
     ///
     /// If `max_gas_burnt_view` is provided, the property in wasm limit
     /// configuration will be adjusted to given value.
