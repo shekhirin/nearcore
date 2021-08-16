@@ -34,7 +34,7 @@ impl RuntimeConfigStore {
         //     println!("Name: {}", path.unwrap().path().display())
         // }
         Self {store: BTreeMap::from_iter(
-            runtime_configs_dir.files().map(|file| {
+            runtime_configs_dir.files().iter().map(|file| {
                 (file.path().file_stem().unwrap().to_str().unwrap().parse().unwrap(),
                  serde_json::from_slice(file.contents()).unwrap()
                 )
