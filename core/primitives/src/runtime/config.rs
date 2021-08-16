@@ -24,6 +24,8 @@ pub struct RuntimeConfig {
     pub wasm_config: VMConfig,
     /// Config that defines rules for account creation.
     pub account_creation_config: AccountCreationConfig,
+    /// Config that defines rules for account creation.
+    pub test_value: u64,
 }
 
 impl Default for RuntimeConfig {
@@ -34,6 +36,7 @@ impl Default for RuntimeConfig {
             transaction_costs: RuntimeFeesConfig::default(),
             wasm_config: VMConfig::default(),
             account_creation_config: AccountCreationConfig::default(),
+            test_value: 0,
         }
     }
 }
@@ -45,6 +48,7 @@ impl RuntimeConfig {
             transaction_costs: RuntimeFeesConfig::free(),
             wasm_config: VMConfig::free(),
             account_creation_config: AccountCreationConfig::default(),
+            test_value: 0,
         }
     }
 }
