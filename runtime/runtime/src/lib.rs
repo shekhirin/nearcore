@@ -68,12 +68,12 @@ pub mod adapter;
 mod balance_checker;
 pub mod cache;
 pub mod config;
+pub mod config_store;
 pub mod ext;
 mod genesis;
 mod metrics;
 pub mod state_viewer;
 mod verifier;
-pub mod config_store;
 
 const EXPECT_ACCOUNT_EXISTS: &str = "account exists, checked above";
 
