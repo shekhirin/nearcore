@@ -25,6 +25,8 @@ impl RuntimeConfigStore {
             println!("Name: {}", file.path().display());
             let protocol_version: ProtocolVersion = file.path().file_stem().unwrap().to_str().unwrap().parse().unwrap();
             println!("PV: {}", protocol_version);
+            let config: RuntimeConfig = serde_json::from_slice(file.contents()).unwrap();
+            println!("RC: {:?}", config);
         }
         // let paths = fs::read_dir("../../../nearcore/res/runtime_configs").unwrap();
         // for path in paths {
