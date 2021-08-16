@@ -20,9 +20,11 @@ impl RuntimeConfigStore {
     /// If `max_gas_burnt_view` is provided, the property in wasm limit
     /// configuration will be adjusted to given value.
     pub fn new(max_gas_burnt_view: Option<Gas>) -> Self {
-        let runtime_configs_dir = include_dir!("../../nearcore/res/runtime_configs");
+        let runtime_configs_dir: Dir = include_dir!("../../nearcore/res/runtime_configs");
         for file in runtime_configs_dir.files() {
             println!("Name: {}", file.path().display());
+            let protocol_version = file.path().file_stem().parse().unwrap();
+            println!("PV: {}", protocol_version);
         }
         // let paths = fs::read_dir("../../../nearcore/res/runtime_configs").unwrap();
         // for path in paths {
