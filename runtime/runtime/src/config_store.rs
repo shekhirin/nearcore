@@ -24,7 +24,7 @@ impl RuntimeConfigStore {
         let runtime_configs_dir: Dir = include_dir!("../../nearcore/res/runtime_configs");
         Self {
             store: BTreeMap::from_iter(runtime_configs_dir.files().iter().map(|file| {
-                let mut config = serde_json::from_slice(file.contents()).unwrap();
+                let mut config: RuntimeConfig = serde_json::from_slice(file.contents()).unwrap();
                 if let Some(gas) = max_gas_burnt_view {
                     config.wasm_config.limit_config.max_gas_burnt_view = gas;
                 }
