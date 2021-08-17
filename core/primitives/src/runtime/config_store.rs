@@ -41,7 +41,7 @@ impl RuntimeConfigStore {
     /// Note that even if some old version is given as the argument, this may
     /// still return configuration which differs from configuration found in
     /// genesis file by the `max_gas_burnt_view` limit.
-    pub fn for_protocol_version(&self, protocol_version: ProtocolVersion) -> &Arc<RuntimeConfig> {
+    pub fn get_config(&self, protocol_version: ProtocolVersion) -> &Arc<RuntimeConfig> {
         self.store
             .range((Bound::Unbounded, Bound::Included(protocol_version)))
             .next_back()
@@ -56,12 +56,21 @@ impl RuntimeConfigStore {
 mod tests {
     use super::*;
     use crate::runtime::config::ActualRuntimeConfig;
+    use crate::version::ProtocolFeature::LowerStorageCost;
 
+    const GENESIS_PROTOCOL_VERSION: ProtocolVersion = 29;
     const RECEIPTS_DEPTH: u64 = 63;
+    const MAX_GAS_BURNT: u64 = 42;
 
     #[test]
     #[should_panic]
     fn test_no_config_for_version() {
+        let store = RuntimeConfigStore::new(None);
+        store.get_config(0);
+    }
+
+    #[test]
+    fn test_backward_compatibility() {
 
     }
 
@@ -82,18 +91,18 @@ mod tests {
 
     #[test]
     fn test_lower_cost() {
-        let config = RuntimeConfig::default();
-        let default_amount = config.storage_amount_per_byte;
-        let config = ActualRuntimeConfig::new(config, None);
-        let base_cfg = config.for_protocol_version(0);
-        let new_cfg = config.for_protocol_version(ProtocolVersion::MAX);
-        assert_eq!(default_amount, base_cfg.storage_amount_per_byte);
-        assert!(default_amount > new_cfg.storage_amount_per_byte);
+        let store = RuntimeConfigStore::new(None);
+        let config = store.store.iter().next().unwrap().1;
+        let base_cfg = store.get_config(GENESIS_PROTOCOL_VERSION);
+        let new_cfg = store.get_config(LowerStorageCost.protocol_version());
+        assert!(base_cfg.storage_amount_per_byte > new_cfg.storage_amount_per_byte);
     }
 
     #[test]
     fn test_max_gas_burnt_view() {
-        let config = ActualRuntimeConfig::new(RuntimeConfig::default(), Some(42));
-        assert_eq!(42, config.for_protocol_version(0).wasm_config.limit_config.max_gas_burnt_view);
+        let config = RuntimeConfigStore::new(None).store.iter().next().unwrap().1;
+        let config_max_gas_burnt = RuntimeConfigStore::new(Some(MAX_GAS_BURNT)).store.iter().next().unwrap().1;
+        assert_ne!(MAX_GAS_BURNT, config.wasm_config.limit_config.max_gas_burnt_view);
+        assert_eq!(MAX_GAS_BURNT, config_max_gas_burnt.wasm_config.limit_config.max_gas_burnt_view);
     }
 }
