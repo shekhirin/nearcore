@@ -781,7 +781,7 @@ fn generate_validator_key(account_id: AccountId, path: &Path) {
 }
 
 lazy_static_include::lazy_static_include_bytes! {
-    pub(crate) MAINNET_GENESIS_JSON => "res/mainnet_genesis.json"
+    pub MAINNET_GENESIS_JSON => "res/mainnet_genesis.json"
 }
 
 /// Initializes genesis and client configs and stores in the given folder
