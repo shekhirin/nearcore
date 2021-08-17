@@ -64,14 +64,21 @@ mod tests {
 
     #[test]
     #[should_panic]
-    fn test_no_config_for_version() {
+    fn test_no_config_before_genesis() {
         let store = RuntimeConfigStore::new(None);
         store.get_config(0);
     }
 
     #[test]
     fn test_backward_compatibility() {
-
+        let default_config = RuntimeConfig::default();
+        let actual_runtime_config = ActualRuntimeConfig::new(default_config, None);
+        let store = RuntimeConfigStore::new(None);
+        for protocol_version in [29, 34, 42, 50] {
+            let old_config = actual_runtime_config.for_protocol_version(protocol_version);
+            let new_config = store.get_config(protocol_version);
+            assert_eq!(old_config, new_config);
+        }
     }
 
     #[test]
