@@ -55,7 +55,6 @@ impl RuntimeConfigStore {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::runtime::config::ActualRuntimeConfig;
     use crate::version::ProtocolFeature::LowerStorageCost;
 
     const GENESIS_PROTOCOL_VERSION: ProtocolVersion = 29;
