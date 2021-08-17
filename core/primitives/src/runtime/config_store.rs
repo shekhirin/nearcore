@@ -45,7 +45,7 @@ impl RuntimeConfigStore {
         self.store
             .range((Bound::Unbounded, Bound::Included(protocol_version)))
             .next_back()
-            .unwrap_or_else(|_| {
+            .unwrap_or_else(|| {
                 panic!("Not found RuntimeConfig for protocol version {}", protocol_version)
             })
             .1
@@ -74,7 +74,7 @@ mod tests {
         let default_config = RuntimeConfig::default();
         let actual_runtime_config = ActualRuntimeConfig::new(default_config, None);
         let store = RuntimeConfigStore::new(None);
-        for protocol_version in [29, 34, 42, 50] {
+        for protocol_version in [29u32, 34u32, 42u32, 50u32].cloned().iter() {
             let old_config = actual_runtime_config.for_protocol_version(protocol_version);
             let new_config = store.get_config(protocol_version);
             assert_eq!(old_config, new_config);
