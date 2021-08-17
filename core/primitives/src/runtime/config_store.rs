@@ -75,7 +75,6 @@ mod tests {
 
     #[test]
     fn test_compatibility() {
-        GENESIS_CONFIG
         let default_config = RuntimeConfig::default();
         let actual_runtime_config = ActualRuntimeConfig::new(default_config, None);
         let store = RuntimeConfigStore::new(None);
