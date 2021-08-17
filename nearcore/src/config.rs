@@ -25,6 +25,7 @@ use near_network::NetworkConfig;
 use near_primitives::account::{AccessKey, Account};
 use near_primitives::hash::CryptoHash;
 use near_primitives::runtime::config::RuntimeConfig;
+use near_primitives::runtime::config_store::MAINNET_GENESIS_JSON;
 use near_primitives::state_record::StateRecord;
 use near_primitives::types::{
     AccountId, AccountInfo, Balance, BlockHeightDelta, EpochHeight, Gas, NumBlocks, NumSeats,
@@ -778,10 +779,6 @@ fn generate_validator_key(account_id: AccountId, path: &Path) {
     let signer = InMemoryValidatorSigner::from_random(account_id.clone(), KeyType::ED25519);
     info!(target: "near", "Use key {} for {} to stake.", signer.public_key(), account_id);
     signer.write_to_file(path);
-}
-
-lazy_static_include::lazy_static_include_bytes! {
-    MAINNET_GENESIS_JSON => "res/mainnet_genesis.json"
 }
 
 /// Initializes genesis and client configs and stores in the given folder

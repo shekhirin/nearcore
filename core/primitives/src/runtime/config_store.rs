@@ -8,6 +8,10 @@ use std::iter::FromIterator;
 use std::ops::Bound;
 use std::sync::Arc;
 
+lazy_static_include::lazy_static_include_bytes! {
+    pub MAINNET_GENESIS_JSON => "../../nearcore/res/mainnet_genesis.json"
+}
+
 /// Stores runtime config for each protocol version where it was updated.
 #[derive(Debug)]
 pub struct RuntimeConfigStore {
@@ -70,7 +74,8 @@ mod tests {
     }
 
     #[test]
-    fn test_backward_compatibility() {
+    fn test_compatibility() {
+        GENESIS_CONFIG
         let default_config = RuntimeConfig::default();
         let actual_runtime_config = ActualRuntimeConfig::new(default_config, None);
         let store = RuntimeConfigStore::new(None);
