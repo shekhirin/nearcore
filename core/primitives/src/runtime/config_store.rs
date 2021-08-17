@@ -65,7 +65,7 @@ mod tests {
     #[should_panic]
     fn test_no_config_before_genesis() {
         let store = RuntimeConfigStore::new(None);
-        store.get_config(0);
+        store.get_config(GENESIS_PROTOCOL_VERSION - 1);
     }
 
     #[test]

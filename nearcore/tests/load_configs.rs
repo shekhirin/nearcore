@@ -1,11 +1,11 @@
+use near_chain_configs::Genesis;
+use near_primitives::runtime::config::ActualRuntimeConfig;
+use near_primitives::runtime::config_store::RuntimeConfigStore;
 use nearcore::config::MAINNET_GENESIS_JSON;
 use node_runtime::config::RuntimeConfig;
-use near_primitives::runtime::config_store::RuntimeConfigStore;
-use near_primitives::runtime::config::ActualRuntimeConfig;
-use near_chain_configs::Genesis;
 
 #[test]
-fn test_compatibility() {
+fn test_mainnet_compatibility() {
     let genesis: Genesis = serde_json::from_slice(*MAINNET_GENESIS_JSON)
         .expect("Failed to deserialize MainNet genesis");
     let genesis_runtime_config = genesis.config.runtime_config;
