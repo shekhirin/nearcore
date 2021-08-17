@@ -1,11 +1,11 @@
-use near_chain_configs::Genesis;
 use near_primitives::runtime::config::ActualRuntimeConfig;
 use near_primitives::runtime::config_store::RuntimeConfigStore;
 use nearcore::config::mainnet_genesis;
-use node_runtime::config::RuntimeConfig;
 
+/// Checks that getting configs from RuntimeConfigStore gives backward compatible results with the
+/// previous way, i.e. taking runtime config from genesis and modifying it.
 #[test]
-fn test_mainnet_compatibility() {
+fn test_mainnet_backwards_compatibility() {
     let genesis = mainnet_genesis();
     let genesis_runtime_config = genesis.config.runtime_config;
     let actual_runtime_config = ActualRuntimeConfig::new(genesis_runtime_config, None);

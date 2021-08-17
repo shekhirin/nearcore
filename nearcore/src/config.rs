@@ -784,8 +784,7 @@ pub fn mainnet_genesis() -> Genesis {
     lazy_static_include::lazy_static_include_bytes! {
         MAINNET_GENESIS_JSON => "res/mainnet_genesis.json",
     };
-    serde_json::from_slice(*MAINNET_GENESIS_JSON)
-        .expect("Failed to deserialize MainNet genesis")
+    serde_json::from_slice(*MAINNET_GENESIS_JSON).expect("Failed to deserialize MainNet genesis")
 }
 
 /// Initializes genesis and client configs and stores in the given folder
