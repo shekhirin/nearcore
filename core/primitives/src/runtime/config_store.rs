@@ -99,7 +99,6 @@ mod tests {
     #[test]
     fn test_lower_cost() {
         let store = RuntimeConfigStore::new(None);
-        let config = store.store.iter().next().unwrap().1;
         let base_cfg = store.get_config(GENESIS_PROTOCOL_VERSION);
         let new_cfg = store.get_config(LowerStorageCost.protocol_version());
         assert!(base_cfg.storage_amount_per_byte > new_cfg.storage_amount_per_byte);
@@ -107,8 +106,10 @@ mod tests {
 
     #[test]
     fn test_max_gas_burnt_view() {
-        let config = RuntimeConfigStore::new(None).store.iter().next().unwrap().1;
-        let config_max_gas_burnt = RuntimeConfigStore::new(Some(MAX_GAS_BURNT)).store.iter().next().unwrap().1;
+        let store = RuntimeConfigStore::new(None);
+        let config = store.store.iter().next().unwrap().1;
+        let store_max_gas_burnt = RuntimeConfigStore::new(Some(MAX_GAS_BURNT));
+        let config_max_gas_burnt = store_max_gas_burnt.store.iter().next().unwrap().1;
         assert_ne!(MAX_GAS_BURNT, config.wasm_config.limit_config.max_gas_burnt_view);
         assert_eq!(MAX_GAS_BURNT, config_max_gas_burnt.wasm_config.limit_config.max_gas_burnt_view);
     }
