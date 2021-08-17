@@ -3,6 +3,7 @@
 //! NOTE: chain-configs is not the best place for `GenesisConfig` since it
 //! contains `RuntimeConfig`, but we keep it here for now until we figure
 //! out the better place.
+use std::convert::TryInto;
 use std::fs::File;
 use std::io::{BufReader, Read};
 use std::path::{Path, PathBuf};
@@ -13,11 +14,14 @@ use num_rational::Rational;
 use serde::de::{self, DeserializeSeed, IgnoredAny, MapAccess, SeqAccess, Visitor};
 use serde::{Deserialize, Deserializer, Serialize};
 use serde_json::Serializer;
+use sha2::digest::Digest;
 use smart_default::SmartDefault;
 
 use crate::genesis_validate::validate_genesis;
-use near_primitives::epoch_manager::EpochConfig;
+use near_primitives::epoch_manager::{EpochConfig, ShardConfig};
+use near_primitives::shard_layout::ShardLayout;
 use near_primitives::types::validator_stake::ValidatorStake;
+use near_primitives::types::NumShards;
 use near_primitives::{
     hash::CryptoHash,
     runtime::config::RuntimeConfig,
@@ -29,8 +33,6 @@ use near_primitives::{
     },
     version::ProtocolVersion,
 };
-use sha2::digest::Digest;
-use std::convert::TryInto;
 
 const MAX_GAS_PRICE: Balance = 10_000_000_000_000_000_000_000;
 
@@ -128,6 +130,9 @@ pub struct GenesisConfig {
     #[serde(default = "default_minimum_stake_divisor")]
     #[default(10)]
     pub minimum_stake_divisor: u64,
+    #[default(None)]
+    // TODO: add config for simple nightshade shards
+    pub simple_nightshade_shard_config: Option<ShardConfig>,
 }
 
 impl From<&GenesisConfig> for EpochConfig {
@@ -147,6 +152,9 @@ impl From<&GenesisConfig> for EpochConfig {
             protocol_upgrade_num_epochs: config.protocol_upgrade_num_epochs,
             protocol_upgrade_stake_threshold: config.protocol_upgrade_stake_threshold,
             minimum_stake_divisor: config.minimum_stake_divisor,
+            shard_layout: ShardLayout::v0(
+                config.num_block_producer_seats_per_shard.len() as NumShards
+            ),
         }
     }
 }
@@ -164,9 +172,9 @@ impl From<&GenesisConfig> for EpochConfig {
 )]
 pub struct GenesisRecords(pub Vec<StateRecord>);
 
-/// `Genesis` has an invariant that we can't enforce due to an optimization for saving memory.
-/// Therefore, all fields are public, but the clients are expected to use the provided methods for
-/// instantiation, serialization and deserialization.
+/// `Genesis` has an invariant that `total_supply` is equal to the supply seen in the records.
+/// However, we can't enfore that invariant. All fields are public, but the clients are expected to
+/// use the provided methods for instantiation, serialization and deserialization.
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct Genesis {
     #[serde(flatten)]
