@@ -25,7 +25,9 @@ pub fn tiny_contract() -> &'static [u8] {
 
 fn read_contract(file_name: &str) -> io::Result<Vec<u8>> {
     let base = Path::new(env!("CARGO_MANIFEST_DIR"));
+    eprintln!("{:?}", base);
     let path = base.join("res").join(file_name);
+    eprintln!("{:?}", path);
     std::fs::read(path)
 }
 
