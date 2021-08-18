@@ -7,6 +7,10 @@ use std::collections::BTreeMap;
 use std::iter::FromIterator;
 use std::ops::Bound;
 use std::sync::Arc;
+use std::fs;
+use std::fs::File;
+
+const RUNTIME_CONFIGS_DIR: &str = "../../nearcore/res/runtime_configs";
 
 /// Stores runtime config for each protocol version where it was updated.
 #[derive(Debug)]
@@ -21,15 +25,18 @@ impl RuntimeConfigStore {
     /// If `max_gas_burnt_view` is provided, the property in wasm limit
     /// configuration will be adjusted to given value.
     pub fn new(max_gas_burnt_view: Option<Gas>) -> Self {
-        let runtime_configs_dir: Dir = include_dir!("../../nearcore/res/runtime_configs");
         Self {
-            store: BTreeMap::from_iter(runtime_configs_dir.files().iter().map(|file| {
-                let mut config: RuntimeConfig = serde_json::from_slice(file.contents()).unwrap();
+            store: BTreeMap::from_iter(fs::read_dir(RUNTIME_CONFIGS_DIR)?.map(|entry| {
+                let path = entry.unwrap().path();
+                let file_stem = path.file_stem().unwrap();
+
+                let data = fs::read(path).unwrap();
+                let mut config: RuntimeConfig = serde_json::from_slice(&data).unwrap();
                 if let Some(gas) = max_gas_burnt_view {
                     config.wasm_config.limit_config.max_gas_burnt_view = gas;
                 }
                 (
-                    file.path().file_stem().unwrap().to_str().unwrap().parse().unwrap(),
+                    .to_str().unwrap().parse().unwrap(),
                     Arc::new(config),
                 )
             })),
