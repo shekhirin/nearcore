@@ -1963,10 +1963,16 @@ fn test_data_reset_before_state_sync() {
         &signer,
         genesis_hash,
     );
+    let tx_hash = tx.get_hash();
     env.clients[0].process_tx(tx, false, false);
     for i in 1..5 {
         env.produce_block(0, i);
     }
+
+    let execution_outcome = env.clients[0].chain.get_execution_outcome(&tx_hash).unwrap();
+    eprintln!("{:?}", execution_outcome);
+    panic!("lol");
+
     // check that the new account exists
     let head = env.clients[0].chain.head().unwrap();
     let head_block = env.clients[0].chain.get_block(&head.last_block_hash).unwrap().clone();
