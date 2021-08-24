@@ -1,7 +1,4 @@
-use include_dir::{include_dir, Dir};
-
 use crate::runtime::config::RuntimeConfig;
-use crate::types::Gas;
 use crate::types::ProtocolVersion;
 use std::collections::BTreeMap;
 use std::fs;
@@ -12,34 +9,37 @@ use std::sync::Arc;
 
 macro_rules! include_config {
     ($file:expr) => {
-        include_bytes!(Path::new("../../nearcore/res/runtime_configs/").join($file))
+        include_bytes!(concat!("../../../../nearcore/res/runtime_configs/", $file))
     };
 }
 
-static CONFIGS: [(ProtocolVersion, &[u8])] =
-    *[(0, include_config!("0.json")), (42, include_config!("42.json"))];
+/// Stores pairs of protocol versions for which runtime config was updated and
+/// the new runtime config in bytes.
+/// Protocol versions are given in increasing order. First one is always 0, so that each version is
+/// mapped to some config.
+static CONFIGS: [(ProtocolVersion, &[u8]); 2] =
+    [(0, include_config!("29.json")), (42, include_config!("42.json"))];
 
 /// Stores runtime config for each protocol version where it was updated.
 #[derive(Debug)]
 pub struct RuntimeConfigStore {
-    /// Maps protocol version to the config with possibly modified `max_gas_burnt_view` limit.
+    /// Maps protocol version to the config.
     store: BTreeMap<ProtocolVersion, Arc<RuntimeConfig>>,
 }
 
 impl RuntimeConfigStore {
     /// Constructs a new store.
-    ///
-    /// If `max_gas_burnt_view` is provided, the property in wasm limit
-    /// configuration will be adjusted to given value.
     pub fn new() -> Self {
-        Self { store: BTreeMap::from_iter(CONFIGS.iter()) }
+        Self {
+            store: BTreeMap::from_iter(CONFIGS.iter().cloned().map(
+                |(protocol_version, config_bytes)| {
+                    (protocol_version, Arc::new(serde_json::from_slice(config_bytes).unwrap()))
+                },
+            )),
+        }
     }
 
     /// Returns a `RuntimeConfig` for the corresponding protocol version.
-    ///
-    /// Note that even if some old version is given as the argument, this may
-    /// still return configuration which differs from configuration found in
-    /// genesis file by the `max_gas_burnt_view` limit.
     pub fn get_config(&self, protocol_version: ProtocolVersion) -> &Arc<RuntimeConfig> {
         self.store
             .range((Bound::Unbounded, Bound::Included(protocol_version)))
@@ -54,7 +54,9 @@ impl RuntimeConfigStore {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::serialize::to_base;
     use crate::version::ProtocolFeature::LowerStorageCost;
+    use near_primitives_core::hash::hash;
 
     const GENESIS_PROTOCOL_VERSION: ProtocolVersion = 29;
     const RECEIPTS_DEPTH: u64 = 63;
@@ -67,6 +69,17 @@ mod tests {
         store.get_config(GENESIS_PROTOCOL_VERSION);
         store.get_config(LowerStorageCost.protocol_version());
         store.get_config(ProtocolVersion::MAX);
+    }
+
+    #[test]
+    fn test_runtime_config_data() {
+        let expected_hashes = vec![
+            "9T3VNaNdGTiZZvuWiymSxtPdwWKNoJmqoTAaZ4JkuSoL",
+            "E82ThZS7KFjpdKmogbMGPwv8nTztxqgSbuCTPRH73XFh",
+        ];
+        for (i, (_, config_bytes)) in CONFIGS.iter().enumerate() {
+            assert_eq!(to_base(&hash(config_bytes)), expected_hashes[i]);
+        }
     }
 
     #[test]
