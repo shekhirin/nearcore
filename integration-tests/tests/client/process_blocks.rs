@@ -1971,6 +1971,19 @@ fn test_data_reset_before_state_sync() {
 
     let execution_outcome = env.clients[0].chain.get_execution_outcome(&tx_hash).unwrap();
     eprintln!("{:?}", execution_outcome);
+    let mut receipt_ids: VecDeque<_> = execution_outcome.outcome_with_id.outcome.receipt_ids.into();
+    while !receipt_ids.is_empty() {
+        let receipt_id = receipt_ids.pop_front().unwrap();
+        let receipt_outcome = env.clients[0].chain.get_execution_outcome(&receipt_id).unwrap();
+        eprintln!("{:?}", receipt_outcome);
+        match receipt_outcome.outcome_with_id.outcome.status {
+            ExecutionStatus::SuccessValue(_) | ExecutionStatus::SuccessReceiptId(_) => {}
+            ExecutionStatus::Failure(_) | ExecutionStatus::Unknown => {
+                panic!("unexpected receipt execution outcome")
+            }
+        }
+        receipt_ids.extend(receipt_outcome.outcome_with_id.outcome.receipt_ids);
+    }
     panic!("lol");
 
     // check that the new account exists
