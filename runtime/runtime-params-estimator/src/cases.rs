@@ -291,8 +291,9 @@ pub fn run(mut config: Config, only_compile: bool) -> CostTable {
     let aggregated = m.aggregate();
     let ratio = Ratio::new(
         aggregated[&Metric::ActionCreateAccount].upper_with_base(&aggregated[&Metric::Receipt]),
+        1,
     );
-    let mut gas = ratio_to_gas(measurements.gas_metric, ratio);
+    let mut gas = ratio_to_gas(m.gas_metric, ratio);
     println!("{:?}", gas);
     panic!("Finish here");
 
