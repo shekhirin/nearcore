@@ -288,6 +288,14 @@ pub fn run(mut config: Config, only_compile: bool) -> CostTable {
     };
     measure_transactions(Metric::ActionCreateAccount, &mut m, &config, None, &mut f, false);
 
+    let aggregated = m.aggregate();
+    let ratio = Ratio::new(
+        aggregated[&Metric::ActionCreateAccount].upper_with_base(&aggregated[&Metric::Receipt]),
+    );
+    let mut gas = ratio_to_gas(measurements.gas_metric, ratio);
+    println!("{:?}", gas);
+    panic!("Finish here");
+
     // Measure the speed of deleting an account.
     let mut deleted_accounts = HashSet::new();
     let mut beneficiaries = HashSet::new();
