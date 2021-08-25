@@ -1945,12 +1945,8 @@ fn test_data_reset_before_state_sync() {
     let mut genesis = Genesis::test(vec!["test0".parse().unwrap()], 1);
     let epoch_length = 5;
     genesis.config.epoch_length = epoch_length;
-    let mut env = TestEnv::new_with_runtime(
-        ChainGenesis::test(),
-        1,
-        1,
-        create_nightshade_runtimes(&genesis, 1),
-    );
+    let runtimes = create_nightshade_runtimes(&genesis, 1);
+    let mut env = TestEnv::new_with_runtime(ChainGenesis::test(), 1, 1, runtimes.clone());
     let signer = InMemorySigner::from_seed("test0".parse().unwrap(), KeyType::ED25519, "test0");
     let genesis_block = env.clients[0].chain.get_block_by_height(0).unwrap();
     let genesis_hash = *genesis_block.hash();
@@ -1968,6 +1964,8 @@ fn test_data_reset_before_state_sync() {
     for i in 1..5 {
         env.produce_block(0, i);
     }
+    let epoch_id = runtimes[0].get_epoch_id_from_prev_block(&genesis_hash).unwrap();
+    eprintln!("Config: {:?}", runtimes[0].get_protocol_config(&epoch_id));
 
     let execution_outcome = env.clients[0].chain.get_execution_outcome(&tx_hash).unwrap();
     eprintln!("{:?}", execution_outcome);
