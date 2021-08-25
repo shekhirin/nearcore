@@ -1967,6 +1967,27 @@ fn test_data_reset_before_state_sync() {
     for i in 1..5 {
         env.produce_block(0, i);
     }
+
+    let epoch_id = runtimes[0].get_epoch_id_from_prev_block(&genesis_hash).unwrap();
+    eprintln!("Config: {:?}", runtimes[0].get_protocol_config(&epoch_id));
+
+    let execution_outcome = env.clients[0].chain.get_execution_outcome(&tx_hash).unwrap();
+    eprintln!("{:?}", execution_outcome);
+    let mut receipt_ids: VecDeque<_> = execution_outcome.outcome_with_id.outcome.receipt_ids.into();
+    while !receipt_ids.is_empty() {
+        let receipt_id = receipt_ids.pop_front().unwrap();
+        let receipt_outcome = env.clients[0].chain.get_execution_outcome(&receipt_id).unwrap();
+        eprintln!("{:?}", receipt_outcome);
+        match receipt_outcome.outcome_with_id.outcome.status {
+            ExecutionStatus::SuccessValue(_) | ExecutionStatus::SuccessReceiptId(_) => {}
+            ExecutionStatus::Failure(_) | ExecutionStatus::Unknown => {
+                panic!("unexpected receipt execution outcome")
+            }
+        }
+        receipt_ids.extend(receipt_outcome.outcome_with_id.outcome.receipt_ids);
+    }
+    panic!("lol");
+
     // check that the new account exists
     let head = env.clients[0].chain.head().unwrap();
     let head_block = env.clients[0].chain.get_block(&head.last_block_hash).unwrap().clone();
