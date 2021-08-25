@@ -146,6 +146,7 @@ impl NightshadeRuntime {
         initial_tracking_shards: Vec<ShardId>,
         trie_viewer_state_size_limit: Option<u64>,
         max_gas_burnt_view: Option<Gas>,
+        runtime_config_store: RuntimeConfigStore,
     ) -> Self {
         let runtime = Runtime::new();
         let trie_viewer = TrieViewer::new(trie_viewer_state_size_limit, max_gas_burnt_view);
@@ -188,7 +189,7 @@ impl NightshadeRuntime {
         );
         NightshadeRuntime {
             genesis_config,
-            runtime_config_store: RuntimeConfigStore::new(),
+            runtime_config_store,
             store,
             tries,
             runtime,
@@ -1765,7 +1766,6 @@ mod test {
     use near_primitives::block::Tip;
     use near_primitives::challenge::SlashedValidator;
     use near_primitives::receipt::ReceiptResult;
-    use near_primitives::runtime::config::RuntimeConfig;
     use near_primitives::transaction::{Action, DeleteAccountAction, StakeAction};
     use near_primitives::types::{BlockHeightDelta, Nonce, ValidatorId, ValidatorKickoutReason};
     use near_primitives::validator_signer::{InMemoryValidatorSigner, ValidatorSigner};
@@ -1873,7 +1873,6 @@ mod test {
                 validators.iter().map(|x| x.len() as ValidatorId).collect(),
             );
             // No fees mode.
-            genesis.config.runtime_config = RuntimeConfig::free();
             genesis.config.epoch_length = epoch_length;
             genesis.config.chunk_producer_kickout_threshold =
                 genesis.config.block_producer_kickout_threshold;
@@ -1890,6 +1889,7 @@ mod test {
                 initial_tracked_shards,
                 None,
                 None,
+                RuntimeConfigStore::free(),
             );
             let (_store, state_roots) = runtime.genesis_state();
             let genesis_hash = hash(&vec![0]);
