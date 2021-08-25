@@ -2877,7 +2877,7 @@ impl<'a> ChainUpdate<'a> {
                         .runtime_adapter
                         .get_epoch_id_from_prev_block(&block.header().prev_hash())
                         .unwrap();
-                    let cfg = self.runtime_adapter.get_protocol_config(&epoch_id);
+                    let cfg = self.runtime_adapter.get_protocol_config(&epoch_id).unwrap();
                     debug!(target: "chain", "Runtime Config: {}",
                            serde_json::to_string_pretty(&cfg)
                                .unwrap());
