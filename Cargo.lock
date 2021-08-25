@@ -2729,6 +2729,7 @@ dependencies = [
  "rand 0.7.3",
  "rayon",
  "serde",
+ "serde_json",
  "strum",
  "thiserror",
  "tracing",
