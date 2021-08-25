@@ -347,6 +347,7 @@ pub(crate) fn action_create_account(
     result: &mut ActionResult,
 ) {
     if AccountId::is_top_level_account_id(account_id) {
+        eprintln!("Top-level! pred = {:?}", predecessor_id);
         if account_id.len() < account_creation_config.min_allowed_top_level_account_length as usize
             && predecessor_id != &account_creation_config.registrar_account_id
         {
