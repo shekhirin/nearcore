@@ -1959,6 +1959,7 @@ fn test_data_reset_before_state_sync() {
         &signer,
         genesis_hash,
     );
+    let tx_hash = tx.get_hash();
     env.clients[0].process_tx(tx, false, false);
     for i in 1..5 {
         env.produce_block(0, i);
