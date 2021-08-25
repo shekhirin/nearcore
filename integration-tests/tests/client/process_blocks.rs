@@ -1945,12 +1945,8 @@ fn test_data_reset_before_state_sync() {
     let mut genesis = Genesis::test(vec!["test0".parse().unwrap()], 1);
     let epoch_length = 5;
     genesis.config.epoch_length = epoch_length;
-    let mut env = TestEnv::new_with_runtime(
-        ChainGenesis::test(),
-        1,
-        1,
-        create_nightshade_runtimes(&genesis, 1),
-    );
+    let runtimes = create_nightshade_runtimes(&genesis, 1);
+    let mut env = TestEnv::new_with_runtime(ChainGenesis::test(), 1, 1, runtimes.clone());
     let signer = InMemorySigner::from_seed("test0".parse().unwrap(), KeyType::ED25519, "test0");
     let genesis_block = env.clients[0].chain.get_block_by_height(0).unwrap();
     let genesis_hash = *genesis_block.hash();
