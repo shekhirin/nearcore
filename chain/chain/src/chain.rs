@@ -2889,8 +2889,9 @@ impl<'a> ChainUpdate<'a> {
                             .enumerate()
                     {
                         debug!(target: "chain", "State root {}:", i);
-                        let trie = runtime
-                            .get_trie_for_shard(shard_id as u64, &header.prev_hash())
+                        let trie = self
+                            .runtime_adapter
+                            .get_trie_for_shard(shard_id as u64, &block.header().prev_hash())
                             .unwrap();
                         let trie = TrieIterator::new(&trie, &state_root).unwrap();
                         for item in trie {
