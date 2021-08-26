@@ -46,7 +46,7 @@ use near_primitives::views::{
     FinalExecutionOutcomeWithReceiptView, FinalExecutionStatus, LightClientBlockView,
     SignedTransactionView,
 };
-use near_store::{ColState, ColStateHeaders, ColStateParts, ShardTries, StoreUpdate};
+use near_store::{ColState, ColStateHeaders, ColStateParts, ShardTries, StoreUpdate, TrieIterator};
 
 use near_primitives::state_record::StateRecord;
 
@@ -2878,9 +2878,29 @@ impl<'a> ChainUpdate<'a> {
                         .get_epoch_id_from_prev_block(&block.header().prev_hash())
                         .unwrap();
                     let cfg = self.runtime_adapter.get_protocol_config(&epoch_id).unwrap();
-                    debug!(target: "chain", "Runtime Config: {}",
+
+                    debug!(target: "chain", "Master debug! Runtime Config: {}",
                            serde_json::to_string_pretty(&cfg)
                                .unwrap());
+
+                    for (i, state_root) in
+                        vec![*prev_chunk_extra.state_root(), chunk_header.prev_state_root()]
+                            .iter()
+                            .enumerate()
+                    {
+                        debug!(target: "chain", "State root {}:", i);
+                        let trie = runtime
+                            .get_trie_for_shard(shard_id as u64, &header.prev_hash())
+                            .unwrap();
+                        let trie = TrieIterator::new(&trie, &state_root).unwrap();
+                        for item in trie {
+                            let (key, value) = item.unwrap();
+                            if let Some(state_record) = StateRecord::from_raw_key_value(key, value)
+                            {
+                                debug!(target: "chain", "{}", state_record);
+                            }
+                        }
+                    }
 
                     // Validate that all next chunk information matches previous chunk extra.
                     validate_chunk_with_chunk_extra(
