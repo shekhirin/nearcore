@@ -2873,6 +2873,15 @@ impl<'a> ChainUpdate<'a> {
                         .get_chunk_extra(&block.header().prev_hash(), shard_id)?
                         .clone();
 
+                    let epoch_id = self
+                        .runtime_adapter
+                        .get_epoch_id_from_prev_block(&block.header().prev_hash())
+                        .unwrap();
+                    let cfg = self.runtime_adapter.get_protocol_config(&epoch_id).unwrap();
+                    debug!(target: "chain", "Master debug! Runtime Config: {}",
+                           serde_json::to_string_pretty(&cfg)
+                               .unwrap());
+
                     // Validate that all next chunk information matches previous chunk extra.
                     validate_chunk_with_chunk_extra(
                         // It's safe here to use ChainStore instead of ChainStoreUpdate
